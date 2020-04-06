@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <title>감시체계</title>
+  </head>
+  <body>
+    <div class="headertop titlebar">
+      <div class="header-logo">
+        <p>header-logo</p>
+      </div>
+    </div>
+    
+    <div class="main-box px-4">
+      <div class="row camera-dashboard">
+        <div class="jumbotron btn btn-outline-info col-md-6 camera-dashboard-pannel" onclick="window.location.reload()">
+          <h1>감시체계 - <small>얼굴검출 및 얼굴인식</small></h1>
+          <span>RetinaFace 와 ArcFace를 리용한 체계_v1.0</span>
+        </div>
+
+        <div class="col-md-6 camera-dashboard-pannel">
+          <hr />
+          <div id="camera_list_top" class="btn-group h-25 w-100"></div>
+          <hr />
+          <div id="camera_list_down" class="btn-group h-25 w-100"></div>
+        </div>
+      </div>
+
+      <div class="zsuo-map">
+        <div class="zsuo-map-box zsuo-map-left">
+          <canvas style="margin: 1px;" id="c" width="1121" height="672"></canvas>
+        </div>
+
+        <div class="zsuo-map-box zsuo-map-right">
+          <div id="worker_list">
+          </div>
+          <div id="suspect_list">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- You can also require other files to run in this process -->
+    <script src="./renderer.js"></script>
+  </body>
+</html>
