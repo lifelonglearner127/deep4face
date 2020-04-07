@@ -18,5 +18,8 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^8.2.0"
+  },
+  "dependencies": {
+    "socket.io": "^2.3.0"
   }
 }

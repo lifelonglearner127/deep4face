@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
+    <!-- <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <title>감시체계</title>
@@ -33,7 +33,7 @@
 
       <div class="zsuo-map">
         <div class="zsuo-map-box zsuo-map-left">
-          <canvas style="margin: 1px;" id="c" width="1121" height="672"></canvas>
+          <canvas style="margin: 1px;" id="canvas" width="1121" height="672"></canvas>
         </div>
 
         <div class="zsuo-map-box zsuo-map-right">
@@ -45,6 +45,7 @@
       </div>
     </div>
     <!-- You can also require other files to run in this process -->
+    <script src="assets/js/socket.io.js"></script>
     <script src="./renderer.js"></script>
   </body>
 </html>
