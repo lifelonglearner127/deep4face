@@ -42,21 +42,38 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-const server = require('http').createServer(app)
-const io = require('socket.io')(server)
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 var lunatic_current_ip = '0';
 
 io.of('/video').on('connection', (socket) => {
   console.log('a lunatic client connected');
 
+  socket.on('change_ip', (msg) => {
+    lunatic_current_ip = msg;
+    console.log(msg);
+  });
+
   socket.on('frame_data', (msg) => {
-    socket.emit('response', lunatic_current_ip)
+    socket.emit('response', lunatic_current_ip);
     if (msg.frame != 0) {
       socket.broadcast.emit('frame_download', {
-        'frame': msg.frame.toString('base64')
+        'frame': msg.frame.toString('base64'),
+        'result': msg.result
       });
     }
   });
+
+  socket.on('result_data', (msg) => {
+    socket.broadcast.emit('result_download', {
+        'image': msg.image.toString('base64'),
+        'time': msg.time,
+        'name': msg.name,
+        'prob': msg.prob,
+        'ip': msg.ip
+    });
+  });
+
   socket.on('disconnect', () => { console.log('a lunatic client disconnected') });
 });
 

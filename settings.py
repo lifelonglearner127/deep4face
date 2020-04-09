@@ -1,5 +1,5 @@
 # Maximum number of faces detected simultaneously
-MAX_FACE_NUMBER = 16
+MAX_FACE_NUMBER = 30
 
 # Max frame rate
 MAX_FRAME_RATE = 25
@@ -14,16 +14,18 @@ USB_CAMERA_CODE = [0]
 ADDRESS_LIST = ['10.41.0.198', '10.41.0.199']
 
 # Image dimension of the feature extraction network
-IMAGE_SIZE = 112, 112
+IMAGE_SIZE = [112, 112]
 
 # Feature extraction Pre-trained model path
-ARCFACE_MODEL = ""
+ARCFACE_MODEL_PREFIX = "/home/dev/Projects/deep4face/models/model"
+
+ARCFACE_EPOCH = 0
 
 # Retinaface pre-trained model path
-RETINAFACE_MODEL = ""
+RETINAFACE_MODEL = "/home/dev/Projects/deep4face/models/R50"
 
 # face recognition classifier model path
-CLASSIFICATION = ""
+RECOGNIZER = "/home/dev/Projects/deep4face/models/output.pkl"
 
 # GPU device ID, -1 means use CPU
 GPU = 0
@@ -39,3 +41,7 @@ EMBEDDING_THRESHOLD = 0.85
 
 # RetinaNet image scaling factor
 SCALES = [1.0]
+
+# Training data path
+TRAIN_DATA = "/home/dev/Projects/deep4face/data/train"
+TRAIN_RAW_DATA = "/home/dev/Projects/deep4face/data/raw"
