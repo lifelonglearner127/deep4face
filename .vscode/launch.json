@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--dataset", "data"]
+            "args": ["--dataset", "/home/dev/Documents/actors"]
         }
     ]
 }

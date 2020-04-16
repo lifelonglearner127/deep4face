@@ -44,4 +44,4 @@ SCALES = [1.0]
 
 # Training data path
 TRAIN_DATA = "/home/dev/Projects/deep4face/data/train"
-TRAIN_RAW_DATA = "/home/dev/Projects/deep4face/data/raw"
+TRAIN_CROPPED_DATA = "/home/dev/Projects/deep4face/data/cropped"
