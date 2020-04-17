@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 import settings
 from detector import FaceDetector
 
@@ -15,5 +16,7 @@ ap.add_argument("-o", "--output",
 args = vars(ap.parse_args())
 
 detector = FaceDetector()
-
+before = time.perf_counter()
 detector.crop_faces_from_dataset(args["dataset"], args["output"])
+after = time.perf_counter()
+print(f"[INFO] It took {after - before} to crop faces")

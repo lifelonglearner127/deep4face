@@ -6,21 +6,18 @@ from imutils.paths import list_images
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neural_network import MLPClassifier
 
-from detector import FaceDetector
 from recognition import FaceEmbedding
 
 
 os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"] = "0"
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset",
-                default=settings.TRAIN_DATA,
+                default=settings.TRAIN_CROPPED_DATA,
                 help="path to the training data folder")
 args = vars(ap.parse_args())
 
-detector = FaceDetector()
 embedding = FaceEmbedding()
 
-detector.crop_faces(list_images(args["dataset"]))
 train_X = embedding.extract_face_embeddings(list_images(args["dataset"]))
 
 le = LabelEncoder()

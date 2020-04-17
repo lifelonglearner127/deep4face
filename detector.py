@@ -1,9 +1,8 @@
 import os
 import datetime
+import random
 import cv2
 import numpy as np
-import progressbar
-
 import settings
 from retinaface.retinaface import RetinaFace
 
@@ -18,6 +17,22 @@ class FaceDetector:
         self.max_face_number = settings.MAX_FACE_NUMBER
         self.counter = 0
         self.image_size = settings.IMAGE_SIZE
+        self.image_types = (
+            ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".jfif"
+        )
+        self.video_types = (
+            ".avi", ".mp4"
+        )
+        self.file_types = self.image_types + self.video_types
+
+    def list_images(self, base_path):
+        for (dir_name, sub_dirlist, file_list) in os.walk(base_path):
+            for filename in file_list:
+                ext = filename[filename.rfind("."):].lower()
+
+                if ext.endswith(self.image_types):
+                    image_path = os.path.join(dir_name, filename)
+                    yield image_path
 
     def detect(self, frame):
         boxes, landmarks = self.detector.detect(frame,
@@ -59,17 +74,8 @@ class FaceDetector:
                   f'. Written into {person_folder} Done:'
                   f'{(i + 1) * 100 / total_images:.2f}%')
 
-    def __save_face(self, base_path, image):
-        i = 0
-        for face, _ in self.detect(image):
-            now_time = datetime.datetime.now()
-            cv2.imwrite(
-                f'{base_path}/{now_time.strftime("%Y_%m_%d_%H_%M_%S")}_{i}.jpg',
-                face
-            )
-            i += 1
-
-    def crop_faces_from_dataset(self, input_folder, output_folder, debug=True):
+    def crop_faces_from_dataset(self, input_folder, output_folder,
+                                img_nums=20, debug=True):
         """Crop faces from raw training dataset
 
         Traing dataset can be video or images that contain human faces.
@@ -81,64 +87,40 @@ class FaceDetector:
         output_folder: The path to the output data folder
         """
 
-        image_types = (
-            ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".jfif"
-        )
-        video_types = (
-            ".avi", ".mp4"
-        )
-        file_types = image_types + video_types
-
         # loop over the training data directory structure
-        for (dir_name, sub_dirlist, file_list) in os.walk(input_folder):
-            # calculate the current directory level
-            relative_path = dir_name.replace(input_folder, '')
-            level = relative_path.count(os.sep)
-
-            if level == 0:
+        for entry in os.scandir(input_folder):
+            if entry.is_file():
                 continue
 
-            person_name = relative_path.split(os.path.sep)[1]
+            person_name = entry.path.split(os.path.sep)[-1]
             person_folder = os.path.join(output_folder, person_name)
 
-            # make the output folder
-            if level == 1:
+            if debug:
+                print(f"[INFO] Processing {person_name}")
+            try:
+                os.makedirs(person_folder)
+            except FileExistsError:
+                pass
+
+            image_paths = list(self.list_images(entry))
+            if len(image_paths) > img_nums:
+                image_paths = random.sample(image_paths, img_nums)
+
+            for i, image_path in enumerate(image_paths):
                 if debug:
-                    print(f"[INFO] Processing {person_name}")
-                try:
-                    os.makedirs(person_folder)
-                except FileExistsError:
-                    pass
+                    print(f"[INFO] Processing {image_path}")
 
-            # process the files
-            for filename in file_list:
-                # determine the file extension of the current file
-                ext = filename[filename.rfind("."):].lower()
-
-                # check to see if the file is
-                # an image or video that should be processed
-                if not ext.endswith(file_types):
-                    continue
-
-                if debug:
-                    print(f"[INFO] Processing {filename}")
-
-                # process the image type file
-                if ext in image_types:
-                    image = cv2.imread(os.path.join(dir_name, filename))
-                    self.__save_face(person_folder, image)
-
-                # process video type file
-                else:
-                    vs = cv2.VideoCapture(os.path.join(dir_name, filename))
-                    while True:
-                        grabbed, frame = vs.read()
-                        if not grabbed:
-                            break
-
-                        self.__save_face(person_folder, image)
-
-                    vs.release()
+                image = cv2.imread(image_path)
+                face_id = 0
+                for face, _ in self.detect(image):
+                    now_time = datetime.datetime.now()
+                    cv2.imwrite(
+                        f'{person_folder}/'
+                        f'{now_time.strftime("%Y_%m_%d_%H_%M_%S")}_'
+                        f'{i}_{face_id}.jpg',
+                        face
+                    )
+                    face_id += 1
 
     def preprocess(self, img, boxes, landmarks, **kwargs):
         aligned = []
