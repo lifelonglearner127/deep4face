@@ -23,6 +23,7 @@ ARCFACE_EPOCH = 0
 
 # Retinaface pre-trained model path
 RETINAFACE_MODEL = "/home/dev/Projects/deep4face/models/mnet.25"
+# RETINAFACE_MODEL = "/home/dev/Projects/deep4face/models/R50"
 
 # face recognition classifier model path
 RECOGNIZER = "/home/dev/Projects/deep4face/models/output.pkl"

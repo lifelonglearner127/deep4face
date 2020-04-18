@@ -6,6 +6,7 @@ import imutils
 import detector as fd
 import recognition
 import settings
+from utils import FPS
 
 
 os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"] = "0"
@@ -23,6 +24,8 @@ with open(settings.RECOGNIZER, 'rb') as f:
     (mlp, le) = pickle.load(f)
 
 vs = cv2.VideoCapture(args["video"])
+fps = FPS()
+fps.start()
 
 while True:
     grabbed, frame = vs.read()
@@ -54,6 +57,9 @@ while True:
                 frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
                 (0, 0, 255), 1)
 
+    fps.update()
+    cv2.putText(frame, f'FPS: {fps.fps():.2f}', (10, 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0, 255, 0), 1)
     cv2.imshow("Result", frame)
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
