@@ -24,8 +24,20 @@ with open(settings.RECOGNIZER, 'rb') as f:
     (mlp, le) = pickle.load(f)
 
 vs = cv2.VideoCapture(args["video"])
+frame = vs.read()[1]
+
 fps = FPS()
 fps.start()
+
+original_width = frame.shape[1]
+original_height = frame.shape[0]
+resized_width = 400
+scale = original_width / resized_width
+
+if args["output"] is not None:
+    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+    writer = cv2.VideoWriter(args["output"], fourcc, 24,
+                             (original_width, original_height), True)
 
 while True:
     grabbed, frame = vs.read()
@@ -33,8 +45,7 @@ while True:
         break
 
     original = frame.copy()
-    original_width = original.shape[1]
-    frame = imutils.resize(frame, width=400)
+    frame = imutils.resize(frame, width=resized_width)
 
     face_candidates = detector.detect(frame)
 
@@ -42,28 +53,39 @@ while True:
         if box[4] < settings.EMBEDDING_THRESHOLD:
             continue
 
+        start_x = int(scale * box[0])
+        start_y = int(scale * box[1])
+        end_x = int(scale * box[2])
+        end_y = int(scale * box[3])
         predict = mlp.predict_proba([embedding.extract_face_embedding(face)])
         prob = predict.max(1)[0]
-        if prob > 0.85:
+        if prob > 0.7:
             name = le.classes_[predict.argmax(1)[0]]
             label = f'{name}: {prob * 100:.2f}%'
+
             cv2.rectangle(
-                frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
+                original, (start_x, start_y), (end_x, end_y),
                 (0, 255, 0), 1)
-            cv2.putText(frame, label, (int(box[0]), int(box[1])),
+            cv2.putText(original, label, (start_x, start_y + 20),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
         else:
             cv2.rectangle(
-                frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
+                original, (start_x, start_y), (end_x, end_y),
                 (0, 0, 255), 1)
 
     fps.update()
-    cv2.putText(frame, f'FPS: {fps.fps():.2f}', (10, 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0, 255, 0), 1)
-    cv2.imshow("Result", frame)
+    cv2.putText(original, f'FPS: {fps.fps():.2f}', (10, 20),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
+    cv2.imshow("Result", original)
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
+
+    if writer is not None:
+        writer.write(original)
+
+if writer is not None:
+    writer.release()
 
 vs.release()
 cv2.destroyAllWindows()
